@@ -24,8 +24,6 @@ const Calculator = () => {
         throw new Error("Division by zero is not allowed.");
       }
     },
-    "%": (a, b) => a % b,
-    "^": (a, b) => Math.pow(a, b),
   };
 
   const handleOperation = (operator) => {
@@ -35,14 +33,23 @@ const Calculator = () => {
         setstorage(value);
         setValue(result);
       }
-    } else if (operator === "AC") {
-      setValue(null);
-      setstorage(null);
-      setOp(null);
+    } else if (operator === "%") {
+      if (value) {
+        setValue(value / 100);
+        setstorage(null);
+        setOp(null);
+      }
+    } else if (operator === "+/-") {
+      if (value) {
+        setValue(value * -1);
+        setstorage(null);
+        setOp(null);
+      }
     } else if (!op) {
       setOp(operator);
       setstorage(null);
     } else if (op) {
+      // storage null olan davranışlar kontrol edilecek
       const result = operators[op](storage, value);
       setstorage(null);
       setValue(result);
