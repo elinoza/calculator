@@ -30,38 +30,48 @@ const Calculator = () => {
 
   const handleOperation = (operator) => {
     if (operator === "=") {
-      setValue(storage);
+      if (value && op) {
+        const result = operators[op](storage ? storage : value, value);
+        setstorage(value);
+        setValue(result);
+      }
+    } else if (operator === "AC") {
+      setValue(null);
+      setstorage(null);
       setOp(null);
     } else if (!op) {
       setOp(operator);
-      setValue(storage);
+      setstorage(null);
     } else if (op) {
       const result = operators[op](storage, value);
-      setstorage(result);
+      setstorage(null);
       setValue(result);
-      setOp(op);
+      setOp(operator);
     }
   };
-  const handleValue = (val) => {
-    if (!value && value !== 0 && !op) {
+
+  const handleConcat = (val) => {
+    if (!storage) {
+      setstorage(value);
       setValue(val);
-      setstorage(val);
-    } else if ((value || value === 0) && !op) {
+    } else {
       const valueAsString = value.toString();
       if (typeof val === "string") {
       } else {
         const newValueAsString = val.toString();
         const newValue = parseFloat(valueAsString.concat(newValueAsString));
         setValue(newValue);
-        setstorage(newValue);
       }
-    } else if ((value || value === 0) && op) {
-      setValue(val);
     }
   };
-  useEffect(() => {
-    console.log(value, storage, op);
-  }, [op, value]);
+  const handleValue = (val) => {
+    if (!value && value !== 0 && !op) {
+      setValue(val);
+      setstorage(val); //muhtemelen gerek kalmadı  kontrol edilecek
+    } else if (value || value === 0) {
+      handleConcat(val);
+    }
+  };
 
   useEffect(() => {
     if (textRef.current.offsetWidth >= 300) {
