@@ -3,33 +3,72 @@ import clsx from "clsx";
 
 const Calculator = () => {
   const [value, setValue] = useState(null);
-  const [operation, setOperation] = useState(null);
+  const [storage, setstorage] = useState(null);
+  //   const [virtualResult, setVirtualResult] = useState(null);
+  const [result, setResult] = useState(null);
+  const [op, setOp] = useState(null);
   const [textShrinkPercentage, setTextShrinkPercentage] = useState(100);
   const textRef = useRef(null);
 
   const arr = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, ","];
   const topOps = ["AC", "+/-", "%"];
   const sideOps = ["/", "*", "-", "+", "="];
+  const operators = {
+    "+": (a, b) => a + b,
+    "-": (a, b) => a - b,
+    "*": (a, b) => a * b,
+    "/": (a, b) => {
+      if (b !== 0) {
+        return a / b;
+      } else {
+        throw new Error("Division by zero is not allowed.");
+      }
+    },
+    "%": (a, b) => a % b,
+    "^": (a, b) => Math.pow(a, b),
+  };
 
-  const handleOperation = (operator) => {};
-  const handleValue = (val) => {
-    if (!value && !operation) {
-      setValue(val);
-    } else if (value && !operation) {
-      const valueAsString = value.toString();
-      const newValueAsString = val.toString();
-
-      const newValue = parseFloat(valueAsString.concat(newValueAsString));
-      setValue(newValue);
+  const handleOperation = (operator) => {
+    if (operator === "=") {
+      setValue(storage);
+      setOp(null);
+    } else if (!op) {
+      setOp(operator);
+      setValue(storage);
+    } else if (op) {
+      const result = operators[op](storage, value);
+      setstorage(result);
+      setValue(result);
+      setOp(op);
     }
   };
+  const handleValue = (val) => {
+    if (!value && value !== 0 && !op) {
+      setValue(val);
+      setstorage(val);
+    } else if ((value || value === 0) && !op) {
+      const valueAsString = value.toString();
+      if (typeof val === "string") {
+      } else {
+        const newValueAsString = val.toString();
+        const newValue = parseFloat(valueAsString.concat(newValueAsString));
+        setValue(newValue);
+        setstorage(newValue);
+      }
+    } else if ((value || value === 0) && op) {
+      setValue(val);
+    }
+  };
+  useEffect(() => {
+    console.log(value, storage, op);
+  }, [op, value]);
+
   useEffect(() => {
     if (textRef.current.offsetWidth >= 300) {
       const newShrinkPercentage = textShrinkPercentage / 1.1;
       textRef.current.style.fontSize = `${newShrinkPercentage}%`;
       setTextShrinkPercentage(newShrinkPercentage);
     }
-    console.log(textRef.current.style.fontSize, textRef.current.offsetWidth);
   }, [value]);
 
   return (
@@ -42,11 +81,11 @@ const Calculator = () => {
         <section className="flex-col  ">
           <div className="flex ">
             {" "}
-            {topOps.map((operator) => (
+            {topOps.map((operator, i) => (
               <div
                 className=" but border  border-[#081E58] text-white text-center text-2xl"
-                onClick={handleOperation}
-                key={operator}
+                onClick={() => handleOperation(operator)}
+                key={i}
               >
                 {operator}
               </div>
@@ -69,13 +108,13 @@ const Calculator = () => {
           </div>
         </section>
         <aside className="flex-col bg-[#B3CEE1] ">
-          {sideOps.map((num) => (
+          {sideOps.map((operator, i) => (
             <div
               className="but border  text-black border-[#081E58]  text-center text-2xl "
-              onClick={handleOperation}
-              key={num}
+              onClick={() => handleOperation(operator)}
+              key={i}
             >
-              {num}
+              {operator}
             </div>
           ))}
         </aside>
