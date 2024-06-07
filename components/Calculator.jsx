@@ -74,11 +74,11 @@ const Calculator = () => {
 
   useEffect(() => {
     if (textRef.current.offsetWidth >= 300) {
-      const newShrinkPercentage = textShrinkPercentage / 1.1;
+      const newShrinkPercentage = textShrinkPercentage / 1.4;
       textRef.current.style.fontSize = `${newShrinkPercentage}%`;
       setTextShrinkPercentage(newShrinkPercentage);
     }
-  }, [value]);
+  }, [display]);
 
   return (
     <div className="w-[360px] shadow">
