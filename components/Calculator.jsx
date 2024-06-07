@@ -2,82 +2,74 @@ import { useRef, useState, useEffect } from "react";
 import clsx from "clsx";
 
 const Calculator = () => {
-  const [value, setValue] = useState(null);
-  const [storage, setstorage] = useState(null);
-  //   const [virtualResult, setVirtualResult] = useState(null);
-  const [result, setResult] = useState(null);
-  const [op, setOp] = useState(null);
+  const [value, setValue] = useState("");
+  const [operation, setOperaton] = useState("");
+  const [display, setDisplay] = useState(null);
   const [textShrinkPercentage, setTextShrinkPercentage] = useState(100);
   const textRef = useRef(null);
 
-  const arr = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, ","];
+  const arr = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, "."];
   const topOps = ["AC", "+/-", "%"];
   const sideOps = ["/", "*", "-", "+", "="];
   const operators = {
-    "+": (a, b) => a + b,
-    "-": (a, b) => a - b,
-    "*": (a, b) => a * b,
-    "/": (a, b) => {
-      if (b !== 0) {
-        return a / b;
-      } else {
-        throw new Error("Division by zero is not allowed.");
-      }
-    },
+    "+/-": (a) => a * -1,
+    "%": (a) => a / 100,
   };
 
-  const handleOperation = (operator) => {
-    if (operator === "=") {
-      if (value && op) {
-        const result = operators[op](storage ? storage : value, value);
-        setstorage(value);
-        setValue(result);
-      }
-    } else if (operator === "%") {
-      if (value) {
-        setValue(value / 100);
-        setstorage(null);
-        setOp(null);
-      }
-    } else if (operator === "+/-") {
-      if (value) {
-        setValue(value * -1);
-        setstorage(null);
-        setOp(null);
-      }
-    } else if (!op) {
-      setOp(operator);
-      setstorage(null);
-    } else if (op) {
-      // storage null olan davranışlar kontrol edilecek
-      const result = operators[op](storage, value);
-      setstorage(null);
-      setValue(result);
-      setOp(operator);
-    }
-  };
-
-  const handleConcat = (val) => {
-    if (!storage) {
-      setstorage(value);
-      setValue(val);
+  const handleTopOperators = (e) => {
+    const operator = e.target.value;
+    if (operator === "AC") {
+      init();
     } else {
-      const valueAsString = value.toString();
-      if (typeof val === "string") {
-      } else {
-        const newValueAsString = val.toString();
-        const newValue = parseFloat(valueAsString.concat(newValueAsString));
-        setValue(newValue);
+      if (value) {
+        const result = operators[operator](display);
+        handleDisplay(result);
+        setValue(result);
+      } else if (operator === "AC") {
+        init();
       }
     }
   };
-  const handleValue = (val) => {
-    if (!value && value !== 0 && !op) {
-      setValue(val);
-      setstorage(val); //muhtemelen gerek kalmadı  kontrol edilecek
-    } else if (value || value === 0) {
-      handleConcat(val);
+  const init = () => {
+    setValue("");
+    setOperaton("");
+    setDisplay(null);
+  };
+
+  const handleDisplay = (displayValue) => {
+    setDisplay(displayValue);
+  };
+  const handleCalculation = () => {
+    //there is an error when isNaN(lastChar) true
+    const updateddisplay = operation + value;
+    const display = eval(updateddisplay);
+    handleDisplay(display);
+    console.log(updateddisplay);
+  };
+
+  const handleOperation = (e) => {
+    let newOperation = operation;
+    const operator = e.target.value;
+    const lastChar = operation.charAt(operation.length - 1);
+
+    if (isNaN(lastChar)) {
+      newOperation = operation.slice(0, operation.length - 1);
+      setOperaton(newOperation);
     }
+    if (operator !== "*" && operator !== "/") {
+      handleCalculation();
+    }
+    const operatorIsEquality = operator === "=";
+    const updatedOperation = operatorIsEquality
+      ? operation + value
+      : operation + value + operator;
+    setOperaton(updatedOperation);
+    setValue("");
+  };
+
+  const handleValue = (e) => {
+    setValue(value + e.target.value);
+    handleDisplay(value + e.target.value);
   };
 
   useEffect(() => {
@@ -90,8 +82,13 @@ const Calculator = () => {
 
   return (
     <div className="w-[360px] shadow">
-      <header className=" w-full flex overflow-hidden items-end justify-end text-7xl h-[150px] text-white p-7 rounded-t bg-[#081E58]">
-        <h1 ref={textRef}>{value ? value : "0"}</h1>
+      <header className=" w-full flex overflow-hidden items-end justify-end text-7xl relative h-[150px] text-white p-7 rounded-t bg-[#081E58]">
+        {operation && (
+          <span className="text-sm text-stone-300 absolute top-2 right-2 p-2">
+            {operation}
+          </span>
+        )}
+        <h1 ref={textRef}>{display ? display : "0"}</h1>
       </header>
       <main className="w-full h-[450px] flex  text-white bg-[#314AA6]">
         {" "}
@@ -99,40 +96,40 @@ const Calculator = () => {
           <div className="flex ">
             {" "}
             {topOps.map((operator, i) => (
-              <div
+              <input
+                type="button"
+                value={operator}
                 className=" but border  border-[#081E58] text-white text-center text-2xl"
-                onClick={() => handleOperation(operator)}
+                onClick={handleTopOperators}
                 key={i}
-              >
-                {operator}
-              </div>
+              />
             ))}
           </div>
           <div className=" flex flex-wrap">
             {" "}
             {arr.map((num) => (
-              <div
+              <input
+                type="button"
+                value={num}
                 className={clsx(
                   num == 0 ? "!w-[180px]" : "",
                   "but p-2 border  border-[#081E58] flex-wrap text-center text-2xl text-white "
                 )}
-                onClick={() => handleValue(num)}
+                onClick={handleValue}
                 key={num}
-              >
-                {num}
-              </div>
+              />
             ))}
           </div>
         </section>
         <aside className="flex-col bg-[#B3CEE1] ">
           {sideOps.map((operator, i) => (
-            <div
+            <input
+              type="button"
+              value={operator}
               className="but border  text-black border-[#081E58]  text-center text-2xl "
-              onClick={() => handleOperation(operator)}
+              onClick={handleOperation}
               key={i}
-            >
-              {operator}
-            </div>
+            />
           ))}
         </aside>
       </main>
