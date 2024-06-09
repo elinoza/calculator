@@ -7,21 +7,31 @@ const Calculator = () => {
   const [display, setDisplay] = useState(null);
   const [textShrinkPercentage, setTextShrinkPercentage] = useState(100);
   const textRef = useRef(null);
+  const [topOps, setTopOps] = useState(["AC", "+/-", "%"]);
 
   const arr = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, "."];
-  const topOps = ["AC", "+/-", "%"];
   const sideOps = ["/", "*", "-", "+", "="];
   const operators = {
     "+/-": (a) => a * -1,
     "%": (a) => a / 100,
   };
 
+  const removeLeadingZeros = (value) => {
+    return parseFloat(value).toString();
+  };
   const handleTopOperators = (e) => {
     const operator = e.target.value;
     if (operator === "AC") {
       init();
+    } else if (operator === "C") {
+      setValue("");
+      handleDisplay(null);
     } else {
       if (value) {
+        const lastCharOfOperation = operation.charAt(operation.length - 1);
+        if (lastCharOfOperation === "-") {
+          return;
+        }
         const result = operators[operator](display);
         handleDisplay(result);
         setValue(result);
@@ -34,43 +44,53 @@ const Calculator = () => {
     setValue("");
     setOperaton("");
     setDisplay(null);
+    setTextShrinkPercentage(100);
+    textRef.current.style.fontSize = `100%`;
   };
 
   const handleDisplay = (displayValue) => {
     setDisplay(displayValue);
   };
-  const handleCalculation = () => {
+  const handleCalculation = (operator, formattedValue) => {
+    if (operator === "*" && operator === "/") {
+      return;
+    }
+
     //there is an error when isNaN(lastChar) true
-    const updateddisplay = operation + value;
+    const updateddisplay = operation + formattedValue;
     const display = eval(updateddisplay);
     handleDisplay(display);
-    console.log(updateddisplay);
+    console.log("updatedDisplay", updateddisplay);
   };
 
   const handleOperation = (e) => {
-    let newOperation = operation;
     const operator = e.target.value;
-    const lastChar = operation.charAt(operation.length - 1);
+    if (!value) {
+      return;
+    }
+    const formattedValue = removeLeadingZeros(value);
 
-    if (isNaN(lastChar)) {
-      newOperation = operation.slice(0, operation.length - 1);
-      setOperaton(newOperation);
-    }
-    if (operator !== "*" && operator !== "/") {
-      handleCalculation();
-    }
+    handleCalculation(operator, formattedValue);
     const operatorIsEquality = operator === "=";
     const updatedOperation = operatorIsEquality
-      ? operation + value
-      : operation + value + operator;
-    setOperaton(updatedOperation);
-    setValue("");
+      ? operation + formattedValue
+      : operation + formattedValue + operator;
+    setValue(operatorIsEquality ? eval(operation + formattedValue) : "");
+    setOperaton(operatorIsEquality ? "" : updatedOperation);
   };
 
   const handleValue = (e) => {
     setValue(value + e.target.value);
     handleDisplay(value + e.target.value);
   };
+
+  useEffect(() => {
+    setTopOps((prevOps) => {
+      const newOps = [...prevOps];
+      newOps[0] = value ? "C" : "AC";
+      return newOps;
+    });
+  }, [value]);
 
   useEffect(() => {
     if (textRef.current.offsetWidth >= 300) {
