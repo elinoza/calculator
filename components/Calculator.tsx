@@ -2,25 +2,26 @@ import { useRef, useState, useEffect } from "react";
 import clsx from "clsx";
 
 const Calculator = () => {
-  const [value, setValue] = useState("");
-  const [operation, setOperaton] = useState("");
-  const [display, setDisplay] = useState(null);
-  const [textShrinkPercentage, setTextShrinkPercentage] = useState(100);
-  const textRef = useRef(null);
-  const [topOps, setTopOps] = useState(["AC", "+/-", "%"]);
+  const [value, setValue] = useState<string>("");
+  const [operation, setOperaton] = useState<string>("");
+  const [display, setDisplay] = useState<string | number | null>(null);
+  const [textShrinkPercentage, setTextShrinkPercentage] = useState<number>(100);
+  const textRef = useRef<HTMLHeadingElement>(null);
+  const [topOps, setTopOps] = useState<string[]>(["AC", "+/-", "%"]);
 
   const arr = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, "."];
   const sideOps = ["/", "*", "-", "+", "="];
-  const operators = {
-    "+/-": (a) => a * -1,
-    "%": (a) => a / 100,
+  const operators: any = {
+    "+/-": (a: number) => a * -1,
+    "%": (a: number) => a / 100,
   };
 
-  const removeLeadingZeros = (value) => {
+  const removeLeadingZeros = (value: string) => {
     return parseFloat(value).toString();
   };
-  const handleTopOperators = (e) => {
-    const operator = e.target.value;
+
+  const handleTopOperators = (e: React.MouseEvent<HTMLInputElement>) => {
+    const operator = e.currentTarget.value;
     if (operator === "AC") {
       init();
     } else if (operator === "C") {
@@ -40,36 +41,37 @@ const Calculator = () => {
       }
     }
   };
+
   const init = () => {
     setValue("");
     setOperaton("");
     setDisplay(null);
     setTextShrinkPercentage(100);
-    textRef.current.style.fontSize = `100%`;
+    if (textRef.current) {
+      textRef.current.style.fontSize = `100%`;
+    }
   };
 
-  const handleDisplay = (displayValue) => {
+  const handleDisplay = (displayValue: string | number | null) => {
     setDisplay(displayValue);
   };
-  const handleCalculation = (operator, formattedValue) => {
-    if (operator === "*" && operator === "/") {
+
+  const handleCalculation = (operator: string, formattedValue: string) => {
+    if (operator === "*" || operator === "/") {
       return;
     }
-
-    //there is an error when isNaN(lastChar) true
     const updateddisplay = operation + formattedValue;
     const display = eval(updateddisplay);
     handleDisplay(display);
     console.log("updatedDisplay", updateddisplay);
   };
 
-  const handleOperation = (e) => {
+  const handleOperation = (e: any) => {
     const operator = e.target.value;
     if (!value) {
       return;
     }
     const formattedValue = removeLeadingZeros(value);
-
     handleCalculation(operator, formattedValue);
     const operatorIsEquality = operator === "=";
     const updatedOperation = operatorIsEquality
@@ -79,7 +81,7 @@ const Calculator = () => {
     setOperaton(operatorIsEquality ? "" : updatedOperation);
   };
 
-  const handleValue = (e) => {
+  const handleValue = (e: any) => {
     setValue(value + e.target.value);
     handleDisplay(value + e.target.value);
   };
@@ -93,7 +95,7 @@ const Calculator = () => {
   }, [value]);
 
   useEffect(() => {
-    if (textRef.current.offsetWidth >= 300) {
+    if (textRef.current && textRef.current.offsetWidth >= 300) {
       const newShrinkPercentage = textShrinkPercentage / 1.4;
       textRef.current.style.fontSize = `${newShrinkPercentage}%`;
       setTextShrinkPercentage(newShrinkPercentage);
