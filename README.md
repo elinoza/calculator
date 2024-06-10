@@ -14,3 +14,4 @@ A calculator app built with Next.js and Tailwind CSS and TypeScript mimicking th
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [TypeScript](https://www.typescriptlang.org/)
