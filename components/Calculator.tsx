@@ -103,58 +103,60 @@ const Calculator = () => {
   }, [display]);
 
   return (
-    <div className="w-[360px] shadow">
-      <header className=" w-full flex overflow-hidden items-end justify-end text-7xl relative h-[150px] text-white p-7 rounded-t bg-[#081E58]">
-        {operation && (
-          <span className="text-sm text-stone-300 absolute top-2 right-2 p-2">
-            {operation}
-          </span>
-        )}
-        <h1 ref={textRef}>{display ? display : "0"}</h1>
-      </header>
-      <main className="w-full h-[450px] flex  text-white bg-[#314AA6]">
-        {" "}
-        <section className="flex-col  ">
-          <div className="flex ">
-            {" "}
-            {topOps.map((operator, i) => (
+    <div className="bg-[#081E58] w-[400px] h-[650px] flex items-center justify-center">
+      <div className="w-[360px]   ">
+        <header className=" w-full flex overflow-hidden items-end justify-end text-7xl mb-3 relative h-[130px] text-stone-800  p-5 shadow-header rounded-t bg-[#D1DBDA]">
+          {operation && (
+            <span className="text-sm text-stone-700 absolute top-2 right-2 p-2">
+              {operation}
+            </span>
+          )}
+          <h1 ref={textRef}>{display ? display : "0"}</h1>
+        </header>
+        <main className="w-full h-[450px] flex  text-white bg-[#314AA6]">
+          {" "}
+          <section className="flex-col  ">
+            <div className="flex ">
+              {" "}
+              {topOps.map((operator, i) => (
+                <input
+                  type="button"
+                  value={operator}
+                  className="shadow-operator  focus:shadow-header text-white text-center text-2xl"
+                  onClick={handleTopOperators}
+                  key={i}
+                />
+              ))}
+            </div>
+            <div className=" flex flex-wrap">
+              {" "}
+              {arr.map((num) => (
+                <input
+                  type="button"
+                  value={num}
+                  className={clsx(
+                    num == 0 ? "!w-[180px]" : "",
+                    "shadow-operator flex-wrap text-center text-2xl text-white focus:shadow-header "
+                  )}
+                  onClick={handleValue}
+                  key={num}
+                />
+              ))}
+            </div>
+          </section>
+          <aside className="flex-col bg-[#B3CEE1] ">
+            {sideOps.map((operator, i) => (
               <input
                 type="button"
                 value={operator}
-                className=" but border  border-[#081E58] text-white text-center text-2xl"
-                onClick={handleTopOperators}
+                className="shadow-operator text-black  text-center text-2xl focus:shadow-header "
+                onClick={handleOperation}
                 key={i}
               />
             ))}
-          </div>
-          <div className=" flex flex-wrap">
-            {" "}
-            {arr.map((num) => (
-              <input
-                type="button"
-                value={num}
-                className={clsx(
-                  num == 0 ? "!w-[180px]" : "",
-                  "but p-2 border  border-[#081E58] flex-wrap text-center text-2xl text-white "
-                )}
-                onClick={handleValue}
-                key={num}
-              />
-            ))}
-          </div>
-        </section>
-        <aside className="flex-col bg-[#B3CEE1] ">
-          {sideOps.map((operator, i) => (
-            <input
-              type="button"
-              value={operator}
-              className="but border  text-black border-[#081E58]  text-center text-2xl "
-              onClick={handleOperation}
-              key={i}
-            />
-          ))}
-        </aside>
-      </main>
+          </aside>
+        </main>
+      </div>
     </div>
   );
 };
