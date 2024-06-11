@@ -63,7 +63,6 @@ const Calculator = () => {
     const updateddisplay = operation + formattedValue;
     const display = eval(updateddisplay);
     handleDisplay(display);
-    console.log("updatedDisplay", updateddisplay);
   };
 
   const handleOperation = (e: any) => {
