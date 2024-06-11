@@ -2,7 +2,7 @@
 
 A calculator app built with Next.js and Tailwind CSS and TypeScript mimicking the functionality of the macOS Calculator.
 
-<img width="630" alt="Ekran Resmi 2024-06-07 15 32 43" src="https://github.com/elinoza/calculator/assets/72200043/e80f6505-0b8a-4373-9282-fd4f4da75187">
+<img width="630" alt="Ekran Resmi 2024-06-11 13 31 00" src="https://github.com/elinoza/calculator/assets/72200043/2e266e3e-0432-4b35-be29-ead69af5f520">
 
 ## Features
 
